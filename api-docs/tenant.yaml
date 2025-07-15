@@ -1,0 +1,772 @@
+openapi: 3.1.0
+info:
+  title: デジタルバックオフィスAPI
+  description: |-
+    テナント管理
+  version: '1.0.0'
+servers:
+  - url: 'https://dbo-dd.dev.dsbizdev.com/v1'
+    description: ステージング環境
+paths:
+  /tenant/customers:
+    get:
+      summary: テナント管理者 顧客一覧
+      parameters:
+        - name: organizationCode
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: customerName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: customerStatusCode
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: servicePublicId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: servicePlanPublicId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - $ref: 'components/parameters.yaml#/components/parameters/DisplayPageNumber'
+        - $ref: 'components/parameters.yaml#/components/parameters/DisplayedResults'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TenantCustomersResponse'
+                  'links':
+                    $ref: 'components/pagination.yaml#/components/schemas/PaginationLinks'
+                  'meta':
+                    $ref: 'components/pagination.yaml#/components/schemas/PaginationMeta'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '403':
+          $ref: 'components/error_response.yaml#/components/responses/Forbidden'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+    post:
+      summary: テナント管理者 顧客登録
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantCustomerPostRequest'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TenantCustomerPostResponse'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '403':
+          $ref: 'components/error_response.yaml#/components/responses/Forbidden'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+  /tenant/customers/{public_id}:
+    get:
+      summary: テナント管理者 顧客詳細
+      parameters:
+        - name: public_id
+          in: path
+          description: '顧客 外部公開用 UUID v4'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TenantCustomerGetRequest'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '403':
+          $ref: 'components/error_response.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: 'components/error_response.yaml#/components/responses/NotFound'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+    put:
+      summary: テナント管理者 顧客更新
+      parameters:
+        - name: public_id
+          in: path
+          description: '顧客 外部公開用 UUID v4'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantCustomerPutRequest'
+      responses:
+        '204':
+          description: OK
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '403':
+          $ref: 'components/error_response.yaml#/components/responses/Forbidden'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+  /tenant/service-contracts:
+    get:
+      summary: テナント管理者 顧客契約情報一覧
+      parameters:
+        - name: tenantName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: servicePublicId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: servicePlanPublicId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: customerName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: contractName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: contractStatusCode
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: serviceUsageStatusCode
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: contractDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: contractStartDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - $ref: 'components/parameters.yaml#/components/parameters/DisplayPageNumber'
+        - $ref: 'components/parameters.yaml#/components/parameters/DisplayedResults'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TenantServiceContractsResponse'
+                  'links':
+                    $ref: 'components/pagination.yaml#/components/schemas/PaginationLinks'
+                  'meta':
+                    $ref: 'components/pagination.yaml#/components/schemas/PaginationMeta'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '403':
+          $ref: 'components/error_response.yaml#/components/responses/Forbidden'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+    post:
+      summary: テナント管理者 顧客契約情報登録
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantServiceContractPostRequest'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TenantServiceContractPostResponse'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '403':
+          $ref: 'components/error_response.yaml#/components/responses/Forbidden'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+    put:
+      summary: テナント管理者 顧客契約情報更新
+      parameters:
+        - name: public_id
+          in: path
+          description: 'サービス契約 外部公開用 UUID v4'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantServiceContractPutRequest'
+      responses:
+        '204':
+          description: OK
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '403':
+          $ref: 'components/error_response.yaml#/components/responses/Forbidden'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+  /tenant/service-contracts/{public_id}:
+    get:
+      summary: テナント管理者 顧客契約情報詳細
+      parameters:
+        - name: public_id
+          in: path
+          description: 'サービス契約 外部公開用 UUID v4'
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TenantServiceContractGetRequest'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '403':
+          $ref: 'components/error_response.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: 'components/error_response.yaml#/components/responses/NotFound'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+
+components:
+  schemas:
+    TenantCustomersResponse:
+      description: 顧客一覧
+      type: object
+      properties:
+        customerPublicId:
+          type: string
+          format: uuid
+          description: 顧客ID
+        customerName:
+          type: string
+          description: 顧客名称
+        customerNameEn:
+          type: string
+          description: 顧客英名
+        customerStatus:
+          type: string
+          description: 顧客ステータス
+        serviceStartDate:
+          type: string
+          format: date
+          nullable: true
+          description: 利用開始日
+        serviceName:
+          type: string
+          nullable: true
+          description: サービス名称
+        servicePlanName:
+          type: string
+          nullable: true
+          description: サービスプラン名称
+    TenantCustomer:
+      description: 顧客情報
+      type: object
+      properties:
+        customerName:
+          type: string
+          description: 顧客名称
+        customerNameEn:
+          type: string
+          description: 顧客英名
+        websiteUrl:
+          type: string
+          format: uri
+          description: 法人サイトURL
+        shareholdersUrl:
+          type: string
+          format: uri
+          description: 株主情報URL
+        executivesUrl:
+          type: string
+          format: uri
+          description: 役員情報URL
+        defaultLanguageCode:
+          type: string
+          description: デフォルト言語
+        countryCodeAlpha3:
+          type: string
+          description: '国コード（ISO 3166-1 alpha-3）'
+        postalCode:
+          type: string
+          nullable: true
+          description: 郵便番号
+        state:
+          type: string
+          nullable: true
+          description: 都道府県
+        city:
+          type: string
+          nullable: true
+          description: 市区町村
+        street:
+          type: string
+          nullable: true
+          description: 番地
+        building:
+          type: string
+          nullable: true
+          description: 建物名・部屋番号
+        remarks:
+          type: string
+          nullable: true
+          description: 備考
+    TenantCustomerPostRequest:
+      description: 顧客登録情報
+      allOf:
+        - $ref: '#/components/schemas/TenantCustomer'
+      required:
+        - customerName
+        - customerNameEn
+        - websiteUrl
+        - shareholdersUrl
+        - executivesUrl
+        - defaultLanguageCode
+        - countryCodeAlpha3
+    TenantCustomerPostResponse:
+      description: 顧客登録結果
+      type: object
+      properties:
+        companyPublicId:
+          type: string
+          format: uuid
+          description: '法人 外部公開用 UUID v4'
+        customerPublicId:
+          type: string
+          format: uuid
+          description: '顧客 外部公開用 UUID v4'
+    TenantCustomerPutRequest:
+      description: 顧客更新情報
+      allOf:
+        - $ref: '#/components/schemas/TenantCustomer'
+        - type: object
+          properties:
+            customerStatusCode:
+              type: string
+              description: 顧客ステータスコード
+      required:
+        - customerName
+        - customerNameEn
+        - websiteUrl
+        - shareholdersUrl
+        - executivesUrl
+        - defaultLanguageCode
+        - countryCodeAlpha3
+        - customerStatusCode
+    TenantCustomerGetRequest:
+      description: 顧客情報
+      allOf:
+        - $ref: '#/components/schemas/TenantCustomer'
+        - type: object
+          properties:
+            customerPublicId:
+              type: string
+              format: uuid
+              description: 顧客ID
+            customerStatus:
+              type: string
+              description: 顧客ステータス名
+            customerStatusCode:
+              type: string
+              description: 顧客ステータスコード
+            serviceContracts:
+              type: array
+              items:
+                type: object
+                description: サービス契約情報
+                properties:
+                  publicId:
+                    type: string
+                    format: uuid
+                    description: 'サービス契約 外部公開用 UUID v4'
+                  contractName:
+                    type: string
+                    description: 契約書名
+                  serviceName:
+                    type: string
+                    description: サービス名
+                  servicePlanName:
+                    type: string
+                    description: サービスプラン名
+                  serviceUsageStatus:
+                    type: string
+                    description: サービス利用ステータス名
+                  serviceUsageStatusCode:
+                    type: string
+                    description: サービス利用ステータスコード
+                  contractStatus:
+                    type: string
+                    description: 契約ステータス名
+                  contractStatusCode:
+                    type: string
+                    description: 契約ステータスコード
+    TenantServiceContractsResponse:
+      description: 顧客契約一覧
+      type: object
+      properties:
+        tenantName:
+          type: string
+          description: テナント名
+        serviceName:
+          type: string
+          description: サービス名
+        servicePlanName:
+          type: string
+          description: サービスプラン名
+        customerName:
+          type: string
+          description: 顧客名
+        customerNameEn:
+          type: string
+          description: 顧客英名
+        contractName:
+          type: string
+          description: 契約書名
+        contractStatus:
+          type: string
+          description: 契約ステータス
+        serviceUsageStatus:
+          type: string
+          description: 利用ステータス
+        contractDate:
+          type: string
+          format: date
+          nullable: true
+          description: 契約締結日
+        contractStartDate:
+          type: string
+          format: date
+          nullable: true
+          description: 契約開始日
+    TenantServiceContract:
+      description: 顧客契約情報
+      type: object
+      properties:
+        servicePublicId:
+          type: string
+          format: uuid
+          description: 'サービス 外部公開用 UUID v4'
+        servicePlanPublicId:
+          type: string
+          format: uuid
+          description: 'サービスプラン 外部公開用 UUID v4'
+        customerPublicId:
+          type: string
+          format: uuid
+          description: '顧客 外部公開用 UUID v4'
+        contractName:
+          type: string
+          maxLength: 255
+          description: 契約書名
+        contractLanguage:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: 契約言語コード
+        contractStatusCode:
+          type: string
+          minLength: 3
+          maxLength: 128
+          description: 契約ステータスコード
+        serviceUsageStatusCode:
+          type: string
+          minLength: 3
+          maxLength: 128
+          description: サービス利用ステータスコード
+        contractDate:
+          type: string
+          format: date
+          description: 契約締結日
+        contractStartDate:
+          type: string
+          format: date
+          description: 契約開始日
+        contractEndDate:
+          type: string
+          format: date
+          nullable: true
+          description: 契約終了日
+        contractAutoUpdate:
+          type: boolean
+          description: 自動更新フラグ
+        customerContactUserName:
+          type: string
+          maxLength: 255
+          description: 顧客担当者名
+        customerContactUserDept:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: 顧客担当者部署
+        customerContactUserTitle:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: 顧客担当者役職
+        customerContactUserMail:
+          type: string
+          format: email
+          maxLength: 255
+          description: 顧客担当者メールアドレス
+        customerContractUserName:
+          type: string
+          maxLength: 255
+          description: 顧客契約担当者名
+        customerContractUserDept:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: 顧客契約担当者部署
+        customerContractUserTitle:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: 顧客契約担当者役職
+        customerContractUserMail:
+          type: string
+          format: email
+          maxLength: 255
+          description: 顧客契約担当者メールアドレス
+        customerPaymentUserName:
+          type: string
+          maxLength: 255
+          description: 顧客支払担当者名
+        customerPaymentUserDept:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: 顧客支払担当者部署
+        customerPaymentUserTitle:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: 顧客支払担当者役職
+        customerPaymentUserMail:
+          type: string
+          format: email
+          maxLength: 255
+          description: 顧客支払担当者メールアドレス
+        serviceRepUserOptionPublicId:
+          type: string
+          format: uuid
+          description: 'サービス担当者 外部公開用 UUID v4'
+        serviceMgrUserOptionPublicId:
+          type: string
+          format: uuid
+          description: 'サービス管理者 外部公開用 UUID v4'
+        invoiceRemindDays:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: 請求書リマインド日数（カンマ区切りの数値）
+          pattern: '^-?\d+(,-?\d+)*$'
+        billingCycleCode:
+          type: string
+          minLength: 3
+          maxLength: 128
+          nullable: true
+          description: 支払いサイクルコード
+        remarks:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: 備考
+    TenantServiceContractPostRequest:
+      description: 顧客契約情報登録
+      allOf:
+        - $ref: '#/components/schemas/TenantServiceContract'
+      required:
+        - servicePublicId
+        - servicePlanPublicId
+        - customerPublicId
+        - contractName
+        - contractLanguage
+        - contractStatusCode
+        - serviceUsageStatusCode
+        - contractDate
+        - contractStartDate
+        - contractAutoUpdate
+        - customerContactUserName
+        - customerContactUserMail
+        - customerContractUserName
+        - customerContractUserMail
+        - customerPaymentUserName
+        - customerPaymentUserMail
+        - serviceRepUserOptionPublicId
+        - serviceMgrUserOptionPublicId
+    TenantServiceContractPostResponse:
+      description: 顧客契約情報登録結果
+      type: object
+      properties:
+        serviceContractPublicId:
+          type: string
+          format: uuid
+          description: 'サービス契約 外部公開用 UUID v4'
+    TenantServiceContractPutRequest:
+      description: 顧客契約情報登録
+      allOf:
+        - $ref: '#/components/schemas/TenantServiceContract'
+      required:
+        - servicePublicId
+        - servicePlanPublicId
+        - customerPublicId
+        - contractName
+        - contractLanguage
+        - contractStatusCode
+        - serviceUsageStatusCode
+        - contractDate
+        - contractStartDate
+        - contractAutoUpdate
+        - customerContactUserName
+        - customerContactUserMail
+        - customerContractUserName
+        - customerContractUserMail
+        - customerPaymentUserName
+        - customerPaymentUserMail
+        - serviceRepUserOptionPublicId
+        - serviceMgrUserOptionPublicId
+    TenantServiceContractGetRequest:
+      description: 顧客契約情報詳細
+      allOf:
+        - $ref: '#/components/schemas/TenantServiceContract'
+        - type: object
+          properties:
+            serviceContractsPublicId:
+              type: string
+              format: uuid
+              description: 顧客契約ID
+            tenantName:
+              type: string
+              description: テナント名
+            serviceName:
+              type: string
+              description: サービス名
+            servicePlanName:
+              type: string
+              description: サービスプラン名
+            customerName:
+              type: string
+              description: 顧客名
+            customerNameEn:
+              type: string
+              description: 顧客英名
+            contractLanguageName:
+              type: string
+              description: 契約言語名
+            contractStatus:
+              type: string
+              description: 契約ステータス名
+            serviceUsageStatus:
+              type: string
+              description: サービス利用ステータス名
+            serviceRepUserName:
+              type: string
+              description: サービス担当者名
+            serviceMgrUserName:
+              type: string
+              description: サービス管理者名
+            billingCycle:
+              type: string
+              description: 支払いサイクル名
+
+  securitySchemes:
+    UserAuth:
+      $ref: 'components/security_schemes.yaml#/components/securitySchemes/BearerAuth'

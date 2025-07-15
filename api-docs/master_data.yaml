@@ -1,0 +1,265 @@
+openapi: 3.1.0
+info:
+  title: デジタルバックオフィスAPI
+  description: |-
+    マスタデータ
+  version: '1.0.0'
+servers:
+  - url: 'https://dbo-dd.dev.dsbizdev.com/v1'
+    description: ステージング環境
+paths:
+  /country-regions:
+    get:
+      summary: 国・地域 取得
+      parameters:
+        - name: countryCodeAlpha3
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: countryCodeAlpha2
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: countryCodeNumeric
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CountryRegionResponse'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+  /misc-data:
+    get:
+      summary: 汎用テーブル選択肢 取得
+      parameters:
+        - name: type
+          description: 選択肢アイテムコード
+          in: query
+          required: false
+          schema:
+            type: string
+          examples:
+            PaymentMethod:
+              summary: 支払い方法
+              value: payment_method
+            PaymentCycle:
+              summary: 支払いサイクル
+              value: payment_cycle
+            WorldRegion:
+              summary: 世界地域
+              value: world_region
+            LanguageCode:
+              summary: 言語コード
+              value: language_code
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MiscDataResponse'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+  /services:
+    get:
+      summary: サービス 取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ServiceResponse'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+  /service-plans:
+    get:
+      summary: サービス利用プラン 取得
+      parameters:
+        - name: servicePublicId
+          description: サービス 外部公開用 UUID v4
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ServicePlanResponse'
+        '401':
+          $ref: 'components/error_response.yaml#/components/responses/UnauthorizedError'
+        '422':
+          $ref: 'components/error_response.yaml#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: 'components/error_response.yaml#/components/responses/InternalServerError'
+      security:
+        - UserAuth: []
+
+components:
+  schemas:
+    CountryRegionResponse:
+      description: 国・地域
+      type: object
+      properties:
+        countryCodeAlpha3:
+          type: string
+          description: '国コード（ISO 3166-1 alpha-3）'
+          example: JPN
+        countryCodeAlpha2:
+          type: string
+          description: '国コード（ISO 3166-1 alpha-2）'
+          example: JP
+        countryCodeNumeric:
+          type: integer
+          description: '国コード（ISO 3166-1 numeric）'
+          example: 392
+        worldRegion:
+          type: string
+          description: 対象言語に翻訳された世界地域
+          example: 日本
+        countryRegionName:
+          type: string
+          description: 対象言語に翻訳された国・地域名称
+          example: 日本国
+        capitalName:
+          type: string
+          description: 対象言語に翻訳された首都名称
+          example: 東京
+    MiscDataResponse:
+      description: 選択肢
+      type: object
+      properties:
+        selectionItemType:
+          type: string
+          description: '選択肢アイテム種別（typeで指定した値）'
+        selectionItemCode:
+          type: string
+          description: 選択肢アイテムコード
+        selectionItemName:
+          type: string
+          description: 選択肢アイテム名称
+        selectionItemShortName:
+          type: string
+          description: 選択肢アイテム短縮名称
+    ServiceResponse:
+      description: サービス情報
+      type: object
+      properties:
+        servicePublicId:
+          type: string
+          format: uuid
+          description: 'サービス公開ID'
+        serviceStatus:
+          type: string
+          description: 'サービスステータス'
+        serviceStatusCode:
+          type: string
+          description: 'サービスステータスコード'
+        serviceStartDate:
+          type: string
+          format: date
+          description: 'サービス開始日'
+        serviceEndDate:
+          type: string
+          format: date
+          nullable: true
+          description: 'サービス終了日'
+        serviceCondition:
+          type: string
+          description: 'サービス条件'
+        ddPlan:
+          type: string
+          description: 'DDプラン'
+        serviceName:
+          type: string
+          description: 'サービス名'
+        serviceDescription:
+          type: string
+          description: 'サービス説明'
+    ServicePlanResponse:
+      type: object
+      properties:
+        servicePlanPublicId:
+          type: string
+          format: uuid
+          description: サービスプランの公開ID
+        servicePlanStatus:
+          type: string
+          description: サービスプランのステータス
+        servicePlanStatusCode:
+          type: string
+          description: サービスプランのステータスコード
+        billingCycle:
+          type: string
+          description: 請求サイクル
+        unitPrice:
+          type: number
+          format: float
+          description: 単価
+        serviceStartDate:
+          type: string
+          format: date
+          nullable: true
+          description: サービス開始日(YYYY-MM-DD形式)
+        serviceEndDate:
+          type: string
+          format: date
+          nullable: true
+          description: サービス終了日(YYYY-MM-DD形式)
+        servicePlanName:
+          type: string
+          description: サービスプラン名
+        servicePlanDescription:
+          type: string
+          description: サービスプランの説明
+
+  securitySchemes:
+    UserAuth:
+      $ref: 'components/security_schemes.yaml#/components/securitySchemes/BearerAuth'
