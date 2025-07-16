@@ -49,6 +49,9 @@ on:
       php-fpm-image-tag-type:
         type: string
         default: 'hash'
+      image-tag-type:
+        type: string
+        default: 'hash'
       # image-tag-type:
       #   type: string
       #   default: 'hash'
@@ -209,43 +212,56 @@ jobs:
         run: |
           docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
 
+  aws-ecs-deploy:
+    name: AWS - ECS Deployment.
+    needs: docker-build-and-push
+    runs-on: ${{ inputs.runs-on }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      # https://github.com/actions/checkout
+      - name: GitHub - checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-  # aws-ecs-deploy:
-  #   name: AWS - ECS Deployment.
-  #   needs: docker-build-and-push
-  #   runs-on: ${{ inputs.runs-on }}
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #   steps:
-  #     # https://github.com/actions/checkout
-  #     - name: GitHub - checkout
-  #       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      # AWS認証
+      # https://github.com/aws-actions/configure-aws-credentials
+      - name: AWS - configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
+        with:
+          aws-region: ${{ inputs.aws-region }}
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          role-duration-seconds: ${{ inputs.aws-role-duration-seconds }}
+          role-session-name: ${{ inputs.aws-role-session-name }}
 
-  #     # https://github.com/aws-actions/configure-aws-credentials
-  #     - name: AWS - configure-aws-credentials
-  #       uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
-  #       with:
-  #         aws-region: ${{ inputs.aws-region }}
-  #         role-to-assume: ${{ inputs.aws-role-to-assume }}
-  #         role-duration-seconds: ${{ inputs.aws-role-duration-seconds }}
-  #         role-session-name: ${{ inputs.aws-role-session-name }}
+      - name: task.jsonファイルのロール変更
+        env:
+          TASKROLEARN: ${{ secrets.TASK_ROLE_ARN }}
+          EXECUTIONROLEARN: ${{ secrets.EXECUTION_ROLE_ARN }}
+        # 下記でタスク定義ファイルのロールをsecretsで定義したロールに置換
+        run: |
+          sed -i 's#"taskRoleArn": "hogehoge"#"taskRoleArn": "'"${TASKROLEARN}"'"#' ${{ inputs.aws-ecs-task-definition-filepath }}
+          sed -i 's#"executionRoleArn": "hogehoge"#"executionRoleArn": "'"${EXECUTIONROLEARN}"'"#' ${{ inputs.aws-ecs-task-definition-filepath }}
+          cat ${{ inputs.aws-ecs-task-definition-filepath }}
 
-  #     # https://github.com/aws-actions/amazon-ecs-render-task-definition
-  #     - name: AWS - amazon-ecs-render-task-definition
-  #       id: amazon-ecs-render-task-definition
-  #       uses: aws-actions/amazon-ecs-render-task-definition@dcaed1bc6bc474b66e41183372f906fe7a4c6325 # v1.7.0
-  #       env:
-  #         REGISTRY: ${{ needs.docker-build-and-push.outputs.registry }}
-  #         REPOSITORY: ${{ format('{0}-{1}-{2}-{3}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env) }}
-  #         CONTAINER_NAME: ${{ inputs.aws-ecs-task-definition-container-name != '' && inputs.aws-ecs-task-definition-container-name || format('{0}-{1}', inputs.aws-ecs-namespace, inputs.aws-ecs-service-name) }}
-  #         IMAGE_TAG: ${{ inputs.image-tag-type == 'hash' && github.sha || 'latest'}}
-  #       with:
-  #         task-definition: ${{ inputs.aws-ecs-task-definition-filepath }}
-  #         image: ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
-  #         container-name: ${{ env.CONTAINER_NAME }}
-  #         environment-variables: ${{ inputs.aws-ecs-task-definition-environment-variables }}
-  #         secrets: ${{ inputs.aws-ecs-task-definition-secrets }}
+      # apache用
+      # タスク定義ファイルの読み込み
+      # https://github.com/aws-actions/amazon-ecs-render-task-definition
+      - name: AWS - amazon-ecs-render-task-definition
+        id: amazon-ecs-render-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@dcaed1bc6bc474b66e41183372f906fe7a4c6325 # v1.7.0
+        env:
+          REGISTRY: ${{ needs.docker-build-and-push.outputs.registry }}
+          REPOSITORY: ${{ format('{0}-{1}-{2}-{3}-{4}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env, inputs.apache-image-tag-type) }}
+          # CONTAINER_NAME: ${{ inputs.aws-ecs-task-definition-container-name != '' && inputs.aws-ecs-task-definition-container-name || format('{0}-{1}', inputs.aws-ecs-namespace, inputs.aws-ecs-service-name) }}
+          CONTAINER_NAME: 'web'
+          IMAGE_TAG: ${{ inputs.apache-image-tag-type == 'hash' && github.sha || 'latest'}}
+        with:
+          task-definition: ${{ inputs.aws-ecs-task-definition-filepath }}
+          image: ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          environment-variables: ${{ inputs.aws-ecs-task-definition-environment-variables }}
+          secrets: ${{ inputs.aws-ecs-task-definition-secrets }}
 
   #     - name: Run - run-show-ecs-task-definition
   #       run: |
