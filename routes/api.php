@@ -21,6 +21,9 @@ require $path . 'tenant' . DIRECTORY_SEPARATOR . 'customer.php';
 require $path . 'tenant' . DIRECTORY_SEPARATOR . 'service_contract.php';
 require $path . 'external' . DIRECTORY_SEPARATOR . 'service_contract.php';
 
+Route::get('/test', function () {
+    dd();
+});
 Route::middleware(['auth'])->group(function () {
     // テストメール送信ルート
     Route::post(
