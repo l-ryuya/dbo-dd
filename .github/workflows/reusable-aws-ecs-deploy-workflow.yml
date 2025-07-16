@@ -166,18 +166,17 @@ jobs:
           build-args: ${{ inputs.docker-build-args-apache }}
           load: true
           target: ${{ inputs.docker-build-target-apache }}
-          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}_${{ inputs.image-name-apache }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
           cache-from: ${{ inputs.cache-from-type }}
           cache-to: ${{ inputs.cache-from-type }},mode=max
-          push: true
 
-  #     - name: Run - docker-push
-  #       env:
-  #         REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-  #         REPOSITORY: ${{ format('{0}-{1}-{2}-{3}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env) }}
-  #         IMAGE_TAG: ${{ inputs.image-tag-type == 'hash' && github.sha || 'latest' }}
-  #       run: |
-  #         docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
+      - name: Run - docker-push
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          REPOSITORY: ${{ format('{0}-{1}-{2}-{3}-{4}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env, inputs.image-name-apache) }}
+          IMAGE_TAG: ${{ inputs.apache-image-tag-type == 'hash' && github.sha || 'latest' }}
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
 
   # aws-ecs-deploy:
   #   name: AWS - ECS Deployment.
