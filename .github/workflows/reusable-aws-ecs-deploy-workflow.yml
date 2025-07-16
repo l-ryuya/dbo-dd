@@ -157,7 +157,7 @@ jobs:
 
       # apache build push
       # https://github.com/docker/build-push-action
-      - name: Docker - build-push-action
+      - name: Docker - apache-build-push-action
         uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
@@ -174,7 +174,7 @@ jobs:
           cache-from: ${{ inputs.cache-from-type }}
           cache-to: ${{ inputs.cache-from-type }},mode=max
 
-      - name: Run - docker-push
+      - name: Run - apache-docker-push
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
           REPOSITORY: ${{ format('{0}-{1}-{2}-{3}-{4}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env, inputs.image-name-apache) }}
@@ -184,7 +184,7 @@ jobs:
 
       # php-fpm build push
       # https://github.com/docker/build-push-action
-      - name: Docker - build-push-action
+      - name: Docker - php-fpm-build-push-action
         uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4 # v6.15.0
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
@@ -201,7 +201,7 @@ jobs:
           cache-from: ${{ inputs.cache-from-type }}
           cache-to: ${{ inputs.cache-from-type }},mode=max
 
-      - name: Run - docker-push
+      - name: Run - php-fpm-docker-push
         env:
           REGISTRY: ${{ steps.ecr-login.outputs.registry }}
           REPOSITORY: ${{ format('{0}-{1}-{2}-{3}-{4}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env, inputs.image-name-php-fpm) }}
