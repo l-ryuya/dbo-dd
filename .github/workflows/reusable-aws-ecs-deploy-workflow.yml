@@ -1,5 +1,8 @@
 on:
   workflow_call:
+    secrets:
+      ROLE_TO_ASSUME:
+        required: true
     inputs:
       ### Common
       project:

@@ -9,6 +9,10 @@ concurrency:
   group: dbo-dd
   cancel-in-progress: true
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   call-workflow-aws-ecs-deploy:
     name: Call Workflow - Docker Build & Push / AWS ECS Deployment
