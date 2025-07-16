@@ -27,7 +27,7 @@ jobs:
       docker-file-apache: './infra/docker/develop/apache/Dockerfile' # dockerfileのパス指定
       docker-build-args-apache: ''                                   # build実行時に引数に渡す値を指定
       image-name-apache: 'apache'
-      image-name-php-fpm: 'image-tag-type-php-fpm'
+      image-name-php-fpm: 'php-fpm'
 
       # AWS関連
       # リポジトリ名を作成、指定に使用パラメーター(format('{0}-{1}-{2}-{3}): project, aws-ecs-namespace, aws-ecs-service-name, env = dsbizdev-dbo-dd-dev
