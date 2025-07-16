@@ -22,15 +22,21 @@ on:
       docker-context:
         type: string
         default: '.'
-      docker-file:
+      docker-file-apache:
+        type: string
+      docker-file-php-fpm:
         type: string
       docker-build-args:
         type: string
       docker-build-target:
         type: string
-      image-tag-type:
+      image-tag-type-apache:
         type: string
-        default: 'hash'
+      image-tag-type-php-fpm:
+        type: string
+      # image-tag-type:
+      #   type: string
+      #   default: 'hash'
       cache-from-type:
         type: string
         default: 'type=gha'
