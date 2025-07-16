@@ -3,6 +3,10 @@ on:
     secrets:
       ROLE_TO_ASSUME:
         required: true
+      TASK_ROLE_ARN:
+        required: true
+      EXECUTION_ROLE_ARN:
+        required: true
     inputs:
       ### Common
       project:
