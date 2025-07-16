@@ -248,12 +248,11 @@ jobs:
       # タスク定義ファイルの読み込み
       # https://github.com/aws-actions/amazon-ecs-render-task-definition
       - name: AWS - amazon-ecs-render-task-definition
-        id: amazon-ecs-render-task-definition
+        id: amazon-ecs-render-task-apache
         uses: aws-actions/amazon-ecs-render-task-definition@dcaed1bc6bc474b66e41183372f906fe7a4c6325 # v1.7.0
         env:
           REGISTRY: ${{ needs.docker-build-and-push.outputs.registry }}
           REPOSITORY: ${{ format('{0}-{1}-{2}-{3}-{4}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env, inputs.apache-image-tag-type) }}
-          # CONTAINER_NAME: ${{ inputs.aws-ecs-task-definition-container-name != '' && inputs.aws-ecs-task-definition-container-name || format('{0}-{1}', inputs.aws-ecs-namespace, inputs.aws-ecs-service-name) }}
           CONTAINER_NAME: 'web'
           IMAGE_TAG: ${{ inputs.apache-image-tag-type == 'hash' && github.sha || 'latest'}}
         with:
@@ -263,9 +262,32 @@ jobs:
           environment-variables: ${{ inputs.aws-ecs-task-definition-environment-variables }}
           secrets: ${{ inputs.aws-ecs-task-definition-secrets }}
 
-  #     - name: Run - run-show-ecs-task-definition
-  #       run: |
-  #         cat ${{ steps.amazon-ecs-render-task-definition.outputs.task-definition }}
+      - name: Run - run-show-ecs-task-definition
+        run: |
+          cat ${{ steps.amazon-ecs-render-task-definition.outputs.task-definition }}
+
+
+      # php-fpm用
+      # タスク定義ファイルの読み込み
+      # https://github.com/aws-actions/amazon-ecs-render-task-definition
+      - name: AWS - amazon-ecs-render-task-definition
+        id: amazon-ecs-render-task-php-fpm
+        uses: aws-actions/amazon-ecs-render-task-definition@dcaed1bc6bc474b66e41183372f906fe7a4c6325 # v1.7.0
+        env:
+          REGISTRY: ${{ needs.docker-build-and-push.outputs.registry }}
+          REPOSITORY: ${{ format('{0}-{1}-{2}-{3}-{4}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env, inputs.php-fpm-image-tag-type) }}
+          CONTAINER_NAME: 'app'
+          IMAGE_TAG: ${{ inputs.php-fpm-image-tag-type == 'hash' && github.sha || 'latest'}}
+        with:
+          task-definition: ${{ steps.amazon-ecs-render-task-apache }}
+          image: ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          environment-variables: ${{ inputs.aws-ecs-task-definition-environment-variables }}
+          secrets: ${{ inputs.aws-ecs-task-definition-secrets }}
+
+      - name: Run - run-show-ecs-task-definition
+        run: |
+          cat ${{ steps.amazon-ecs-render-task-definition.outputs.task-definition }}
 
   #     # https://github.com/aws-actions/amazon-ecs-deploy-task-definition
   #     - name: AWS - amazon-ecs-deploy-task-definition
