@@ -14,14 +14,12 @@ permissions:
   contents: read
 
 jobs:
+  # apache+php-fpm環境
   call-workflow-aws-ecs-deploy:
     name: Call Workflow - Docker Build & Push / AWS ECS Deployment
     uses: ./.github/workflows/reusable-aws-ecs-deploy-workflow.yml
     with:
       # docker関連
-      # docker-context: '.'
-      # docker-file: './infra/docker/develop/php/Dockerfile'
-      # docker-build-args: ''
       docker-context: '.'                                            #ビルド時のディレクトリ指定
       docker-file-php-fpm: './infra/docker/develop/php/Dockerfile'   # dockerfileのパス指定
       docker-file-apache: './infra/docker/develop/apache/Dockerfile' # dockerfileのパス指定
@@ -30,10 +28,6 @@ jobs:
       image-name-php-fpm: 'php-fpm'
 
       # AWS関連
-      # リポジトリ名を作成、指定に使用パラメーター(format('{0}-{1}-{2}-{3}): project, aws-ecs-namespace, aws-ecs-service-name, env = dsbizdev-dbo-dd-dev
-      # ECSクラスタ名に使用パラメータ(format('{0}-{1}-{2}): project, aws-ecs-cluster-name, env = dsbizdev-dbo-cluster-dev
-      # ECSサービス名に使用パラメータ(format('{0}-{1}-{2}-{3}): project, aws-ecs-namespace, aws-ecs-service-name, env = dsbizdev-dbo-dd-dev
-      # ECSコンテナ名に使用パラメーター(format('{0}-{1}-{2}):aws-ecs-namespace, aws-ecs-service-name = dbo-dd
       project: 'dsbizdev'
       env: "dev"
       aws-region: "ap-northeast-1"
@@ -42,6 +36,28 @@ jobs:
       aws-ecs-service-name: "dd"
       aws-ecs-task-definition-filepath: "./infra/ecs-task.json"
       aws-ecs-task-definition-container-name: ''
+      aws-ecs-task-definition-environment-variables: ''
+      aws-ecs-task-definition-secrets: ''
+      aws-ecs-desired-count: 1
+      aws-ecs-wait-for-service-stability: false
+    secrets: inherit
+
+  # bitnami環境
+  call-workflow-aws-ecs-deploy-bitnami:
+    name: Call Workflow - Docker Build & Push / AWS ECS Deployment
+    uses: ./.github/workflows/reusable-aws-ecs-deploy-workflow-bitnami.yml
+    with:
+      project: 'dsbizdev'
+      env: "dev"
+      docker-context: '.'
+      docker-file: './infra/docker/bitnami/php/Dockerfile'
+      docker-build-args: ''
+      aws-region: "ap-northeast-1"
+      aws-ecs-cluster-name: "dbo-cluster"
+      aws-ecs-namespace: "dbo"
+      aws-ecs-service-name: "dd"
+      aws-ecs-task-definition-filepath: "./infra/docker/bitnami/ecs-task.json"
+      aws-ecs-task-definition-container-name: 'bitnami'
       aws-ecs-task-definition-environment-variables: ''
       aws-ecs-task-definition-secrets: ''
       aws-ecs-desired-count: 1
