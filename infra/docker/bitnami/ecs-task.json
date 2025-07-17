@@ -1,5 +1,5 @@
 {
-  "family": "dsbizdev-dbo-dd-dev",
+  "family": "dsbizdev-dbo-dd-dev-bitnami",
   "taskRoleArn": "hogehoge",
   "executionRoleArn": "hogehoge",
   "networkMode": "awsvpc",
@@ -7,7 +7,7 @@
   "memory": "512",
   "containerDefinitions": [
     {
-      "name": "dbo-dd",
+      "name": "bitnami",
       "image": "<IMAGE_URI>",
       "cpu": 128,
       "memory": 256,
