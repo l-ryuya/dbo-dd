@@ -226,6 +226,9 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Dump OIDC token subject
+        run: echo ${{ steps.configure-aws-credentials.outputs.web_identity_token }}
+
       # https://github.com/actions/checkout
       - name: GitHub - checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
