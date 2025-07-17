@@ -1,5 +1,5 @@
 {
-  "family": "dsbizdev-dbo-dd-dev",
+  "family": "dsbizdev-dbo-dd-dev-apache-php-fpm",
   "taskRoleArn": "hogehoge",
   "executionRoleArn": "hogehoge",
   "networkMode": "awsvpc",
