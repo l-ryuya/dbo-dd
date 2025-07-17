@@ -22,35 +22,16 @@ FROM php:8.3-fpm
 RUN apt-get update && apt-get install -y \
     zip unzip \
     libzip-dev \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    vim \
     libpq-dev \
     libonig-dev \
-    libxml2-dev \
-    iproute2 \
-    procps \
-    net-tools && \
+    libxml2-dev && \
     docker-php-ext-configure zip && \
-    docker-php-ext-install pdo pdo_mysql mysqli zip gd pdo_pgsql && \
+    docker-php-ext-install \
+        zip \
+        pdo \
+        pdo_pgsql \
+        mbstring && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# RUN apt-get update && \
-#     apt-get install -y \
-#     zip unzip \
-#     libzip-dev \
-#     libpng-dev \
-#     libjpeg62-turbo-dev \
-#     libfreetype6-dev \
-#     vim \
-#     libpq-dev \
-#     libonig-dev \
-#     libxml2-dev && \
-#     docker-php-ext-configure zip && \
-#     docker-php-ext-install pdo pdo_mysql mysqli zip gd pdo_pgsql && \
-#     apt-get clean && \
-#     rm -rf /var/lib/apt/lists/*
 
 COPY infra/docker/develop/php/php.dev.ini /usr/local/etc/php/
 COPY infra/docker/develop/php/www.conf /usr/local/etc/php-fpm.d/www.conf
