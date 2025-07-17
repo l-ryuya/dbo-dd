@@ -1,13 +1,7 @@
 on:
   workflow_call:
-    secrets:
-      # ROLE_TO_ASSUME:
-      #   required: true
-      TASK_ROLE_ARN:
-        required: true
-      EXECUTION_ROLE_ARN:
-        required: true
     inputs:
+
       ### Common
       project:
         required: true
@@ -249,8 +243,8 @@ jobs:
 
       - name: task.jsonファイルのロール変更
         env:
-          TASKROLEARN: ${{ secrets.TASK_ROLE_ARN }}
-          EXECUTIONROLEARN: ${{ secrets.EXECUTION_ROLE_ARN }}
+          TASKROLEARN: ${{ vars.TASK_ROLE_ARN }}
+          EXECUTIONROLEARN: ${{ vars.EXECUTION_ROLE_ARN }}
         # 下記でタスク定義ファイルのロールをsecretsで定義したロールに置換
         run: |
           sed -i 's#"taskRoleArn": "hogehoge"#"taskRoleArn": "'"${TASKROLEARN}"'"#' ${{ inputs.aws-ecs-task-definition-filepath }}
