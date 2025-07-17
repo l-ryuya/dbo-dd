@@ -47,6 +47,6 @@ jobs:
       aws-ecs-desired-count: 1
       aws-ecs-wait-for-service-stability: false
     secrets:
-      ROLE_TO_ASSUME: ${{secrets.ROLE_TO_ASSUME}}
+    #   ROLE_TO_ASSUME: ${{secrets.ROLE_TO_ASSUME}}
       TASK_ROLE_ARN: ${{secrets.TASK_ROLE_ARN}}
       EXECUTION_ROLE_ARN: ${{secrets.EXECUTION_ROLE_ARN}}
