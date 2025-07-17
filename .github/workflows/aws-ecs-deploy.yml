@@ -16,7 +16,7 @@ permissions:
 jobs:
   # apache+php-fpm環境
   call-workflow-aws-ecs-deploy:
-    name: Call Workflow - Docker Build & Push / AWS ECS Deployment
+    name: Call Apache + PHP-FPM Workflow - Docker Build & Push / AWS ECS Deployment
     uses: ./.github/workflows/reusable-aws-ecs-deploy-workflow.yml
     with:
       # docker関連
@@ -44,7 +44,7 @@ jobs:
 
   # bitnami環境
   call-workflow-aws-ecs-deploy-bitnami:
-    name: Call Workflow - Docker Build & Push / AWS ECS Deployment
+    name: Call BitNami Workflow - Docker Build & Push / AWS ECS Deployment
     uses: ./.github/workflows/reusable-aws-ecs-deploy-workflow-bitnami.yml
     with:
       project: 'dsbizdev'
