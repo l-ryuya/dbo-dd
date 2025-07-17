@@ -113,7 +113,7 @@ on:
 
 jobs:
   docker-build-and-push:
-    name: Docker - Build and Push.
+    name: Docker - Apache + PHP-FPM Build and Push.
     runs-on: ${{ inputs.runs-on }}
     environment:
       name: github_actions
@@ -216,7 +216,7 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
 
   aws-ecs-deploy:
-    name: AWS - ECS Deployment.
+    name: AWS - Apache + PHP-FPM ECS Deployment.
     needs: docker-build-and-push
     runs-on: ${{ inputs.runs-on }}
     environment:

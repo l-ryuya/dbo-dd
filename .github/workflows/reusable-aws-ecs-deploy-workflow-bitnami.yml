@@ -88,7 +88,7 @@ on:
 
 jobs:
   docker-build-and-push:
-    name: Docker - Build and Push.
+    name: Docker - BitNam Build and Push.
     runs-on: ${{ inputs.runs-on }}
     environment:
       name: github_actions
@@ -155,7 +155,7 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY}}:${{ env.IMAGE_TAG }}
 
   aws-ecs-deploy:
-    name: AWS - ECS Deployment.
+    name: AWS - Bitnami ECS Deployment.
     needs: docker-build-and-push
     runs-on: ${{ inputs.runs-on }}
     environment:
@@ -195,7 +195,8 @@ jobs:
         env:
           REGISTRY: ${{ needs.docker-build-and-push.outputs.registry }}
           REPOSITORY: ${{ format('{0}-{1}-{2}-{3}-{4}', inputs.project, inputs.aws-ecs-namespace, inputs.aws-ecs-service-name, inputs.env, inputs.aws-ecs-task-definition-container-name) }}
-          CONTAINER_NAME: ${{ inputs.aws-ecs-task-definition-container-name != '' && inputs.aws-ecs-task-definition-container-name || format('{0}-{1}', inputs.aws-ecs-namespace, inputs.aws-ecs-service-name) }}
+          # CONTAINER_NAME: ${{ inputs.aws-ecs-task-definition-container-name != '' && inputs.aws-ecs-task-definition-container-name || format('{0}-{1}', inputs.aws-ecs-namespace, inputs.aws-ecs-service-name) }}
+          CONTAINER_NAME: 'bitnami'
           IMAGE_TAG: ${{ inputs.image-tag-type == 'hash' && github.sha || 'latest'}}
         with:
           task-definition: ${{ inputs.aws-ecs-task-definition-filepath }}
