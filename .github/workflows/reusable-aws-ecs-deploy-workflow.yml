@@ -129,6 +129,9 @@ jobs:
     outputs:
       registry: ${{ steps.ecr-login.outputs.registry }}
     steps:
+      - name: Dump OIDC token subject
+        run: echo ${{ steps.configure-aws-credentials.outputs.web_identity_token }}
+
       # Dockerにログイン？
       # https://github.com/marketplace/actions/docker-login
       - name: Docker - login-action
@@ -226,8 +229,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Dump OIDC token subject
-        run: echo ${{ steps.configure-aws-credentials.outputs.web_identity_token }}
+
 
       # https://github.com/actions/checkout
       - name: GitHub - checkout
