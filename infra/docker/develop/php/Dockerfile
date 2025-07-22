@@ -14,6 +14,10 @@ COPY ./storage/ /build/storage/
 
 WORKDIR /build/
 
+
+
+
+
 # Composerで依存インストール（本番用にno-devオプション）
 RUN composer install -q --no-dev --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist && \
     composer dump-autoload
