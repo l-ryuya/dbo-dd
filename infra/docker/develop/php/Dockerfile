@@ -8,15 +8,10 @@ COPY /config/ /build/config/
 COPY /database/ /build/database/
 COPY /lang/ /build/lang/
 COPY /public/ /build/public/
-# COPY resources/ /build/resources/  # 必要に応じて有効化してください
 COPY ./routes/ /build/routes/
 COPY ./storage/ /build/storage/
 
 WORKDIR /build/
-
-
-
-
 
 # Composerで依存インストール（本番用にno-devオプション）
 RUN composer install -q --no-dev --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist && \
@@ -24,14 +19,8 @@ RUN composer install -q --no-dev --no-ansi --no-interaction --no-scripts --no-pr
 FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y \
-    zip unzip \
-    libzip-dev \
-    libpq-dev \
     libonig-dev \
-    libxml2-dev && \
-    docker-php-ext-configure zip && \
     docker-php-ext-install \
-        zip \
         pdo \
         pdo_pgsql \
         mbstring && \
